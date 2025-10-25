@@ -14,6 +14,9 @@ conda activate agent-dev
 pip install -r requirements.txt
 ```
 
+3. 注册QWen API  
+https://bailian.console.aliyun.com/?tab=model#/api-key  
+
 ## 开发和运行项目
 探索LLM的静态分析能力，
 
@@ -23,3 +26,6 @@ https://chengpeng-wang.github.io/publications/LLMDFA_NeurIPS2024.pdf
 CORE: Benchmarking LLMs’ Code Reasoning Capabilities through Static Analysis Tasks
 
 1. 去找测试用例  
+
+
+2. 尝试模仿CORE基于LLM去实现数据流分析和程序切片  
