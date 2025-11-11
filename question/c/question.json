@@ -1,0 +1,18 @@
+[
+    {
+        "file_name": "1.c",
+        "question": "**Question**: Is there information flow from `(s, 17)` to `(oline, 25)` in function `ope_line`? If so, provide a trace. **Output**:"
+    },
+    {
+        "file_name": "2.c",
+        "question": "**Question**: Is there information flow from `(s, 17)` to `(oline, 256)` in function `ope_line`? If so, provide a trace. **Output**:"
+    },
+    {
+        "file_name": "3.c",
+        "question": "**Question**: Is there information flow from `(factor, 20)` to `(buffer, 18)` in function `main`? If so, provide a trace. **Output**:"
+    },
+    {
+        "file_name": "4.c",
+        "question": "**Question**: Is there information flow from `(s, 17)` to `(oline, 31)` in function `ope_line`? If so, provide a trace. **Output**:"
+    }
+]

@@ -1,0 +1,20 @@
+{
+  "InformationFlow": true,
+  "Trace": [
+    {
+      "from": ["brand", 19],
+      "to":   ["deviceId", 24],
+      "type": "data"
+    },
+    {
+      "from": ["deviceId", 24],
+      "to":   ["options", 56],
+      "type": "data"
+    },
+    {
+      "from": ["options", 56],
+      "to":   ["options", 64],
+      "type": "data"
+    }
+  ]
+}

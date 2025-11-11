@@ -1,0 +1,544 @@
+# Button Object Allocation Demo 项目数据流分析
+# 分析日期: 2025年11月4日
+# 文件: entry/src/main/ets/pages/Index.ets
+
+target_var: deviceId 18
+other_vars: 
+  - manufacturer 30
+  - brand 31
+  - productModel 32
+  - osFullName 33
+  - marketName 34
+  - buttonHint 22
+  - error 41
+
+early_return:
+  - 41  # catch block 中的 error 处理
+    
+# ============ 数据源 (SOURCE) ============
+manufacturer 30:
+  description: "设备制造商信息 (SOURCE)"
+  security_level: S4
+  type: "string"
+  datadep:
+    - deviceInfo.manufacture  # 系统API调用
+  controldep:
+    - try_block 28  # try block
+  is_source: True
+  source_type: "Device Information"
+  
+brand 31:
+  description: "设备品牌信息 (SOURCE)"
+  security_level: S4
+  type: "string"
+  datadep:
+    - deviceInfo.brand  # 系统API调用
+  controldep:
+    - try_block 28  # try block
+  is_source: True
+  source_type: "Device Information"
+  
+productModel 32:
+  description: "设备产品型号 (SOURCE)"
+  security_level: S4
+  type: "string"
+  datadep:
+    - deviceInfo.productModel  # 系统API调用
+  controldep:
+    - try_block 28  # try block
+  is_source: True
+  source_type: "Device Information"
+  
+osFullName 33:
+  description: "操作系统全名 (SOURCE)"
+  security_level: S3
+  type: "string"
+  datadep:
+    - deviceInfo.osFullName  # 系统API调用
+  controldep:
+    - try_block 28  # try block
+  is_source: True
+  source_type: "System Information"
+  
+marketName 34:
+  description: "设备市场名称 (SOURCE)"
+  security_level: S4
+  type: "string"
+  datadep:
+    - deviceInfo.marketName  # 系统API调用
+  controldep:
+    - try_block 28  # try block
+  is_source: True
+  source_type: "Device Information"
+
+# ============ 中间变量 ============
+deviceId 18:
+  description: "组件私有属性 - 存储组合后的设备ID字符串"
+  security_level: S1  # 初始化为空字符串
+  reset: False
+  datadep: Null
+  controldep: Null
+  initial_value: "''"
+  
+deviceId 37:
+  description: "组合后的设备ID字符串 - 在aboutToAppear中赋值"
+  security_level: S4
+  reset: False
+  datadep:
+    - manufacturer 30
+    - brand 31
+    - productModel 32
+    - marketName 34
+    - osFullName 33
+  controldep:
+    - try_block 28  # try block
+  operation: "Template literal string concatenation"
+  
+deviceId 43:
+  description: "异常情况下的默认值"
+  security_level: S1  # 公开数据 (固定字符串 'unknown')
+  reset: True
+  datadep: Null
+  controldep:
+    - catch_block 41  # catch block
+  note: "deviceId 在异常时被重置为非敏感值"
+  
+buttonHint 22:
+  description: "组件状态变量 - 按钮的hint状态"
+  security_level: S1  # 初始化为空字符串
+  reset: False
+  datadep: Null
+  controldep: Null
+  initial_value: "''"
+  annotation: "@State"
+  
+buttonHint 68:
+  description: "在sendMessage方法中赋值为deviceId (SINK数据)"
+  security_level: S4
+  reset: False
+  datadep:
+    - deviceId 18  # 引用敏感的deviceId
+  controldep:
+    - onClick 136  # 按钮点击事件
+  operation: "State assignment from sensitive source"
+  note: "关键: 敏感信息从deviceId流向buttonHint"
+
+# ============ SINK 相关变量 ============
+buttonHint 62:
+  description: "在日志中输出buttonHint (SINK点 - 第一次泄露)"
+  security_level: S4
+  type: "string"
+  is_sink_data: True
+  datadep:
+    - buttonHint 22  # 间接引用deviceId
+  controldep:
+    - if_condition 61  # if buttonHint !== ''
+    - onClick 136
+  flows_to_sink: "hilog.info"
+  sink_severity: MEDIUM
+  note: "第2次及以后点击时泄露 - 敏感信息输出到系统日志"
+
+buttonHint 63:
+  description: "在控制台输出buttonHint (SINK点 - 第二次泄露)"
+  security_level: S4
+  type: "string"
+  is_sink_data: True
+  datadep:
+    - buttonHint 22  # 间接引用deviceId
+  controldep:
+    - if_condition 61  # if buttonHint !== ''
+    - onClick 136
+  flows_to_sink: "console.info"
+  sink_severity: HIGH
+  note: "第2次及以后点击时泄露 - 敏感信息输出到控制台日志"
+
+deviceId 39:
+  description: "在console中输出deviceId (SINK点 - 初始泄露)"
+  security_level: S4
+  type: "string"
+  is_sink_data: True
+  datadep:
+    - deviceId 37
+  controldep:
+    - try_block 28
+  flows_to_sink: "console.info"
+  sink_severity: MEDIUM
+  note: "在aboutToAppear中立即输出敏感信息"
+
+deviceId 39_hilog:
+  description: "在hilog中输出deviceId (SINK点)"
+  security_level: S4
+  type: "string"
+  is_sink_data: True
+  datadep:
+    - deviceId 37
+  controldep:
+    - try_block 28
+  flows_to_sink: "hilog.info"
+  sink_severity: MEDIUM
+  note: "在aboutToAppear中通过系统日志输出敏感信息"
+
+error 41:
+  description: "异常捕获"
+  reset: False
+  datadep: Null
+  controldep:
+    - try_block 28  # try-catch block
+  is_control_node: True
+      
+try_block 28:
+  description: "try-catch 控制流入口"
+  reset: False
+  datadep: Null
+  controldep:
+    - try_block 28  # 自引用
+  is_control_node: True
+  
+if_condition 61:
+  description: "条件判断: if (this.buttonHint !== '')"
+  reset: False
+  datadep: Null
+  controldep:
+    - onClick 136
+  is_control_node: True
+  note: "控制第2次及以后点击时的泄露"
+  
+onClick 136:
+  description: "按钮点击事件处理器"
+  reset: False
+  datadep: Null
+  controldep:
+    - onClick 136  # 事件循环
+  is_control_node: True
+  note: "多次点击触发sendMessage方法"
+
+# ========================================
+# 数据流路径 (Data Flow Paths)
+# ========================================
+
+data_flow_paths:
+  
+  path_1:
+    name: "初始化泄露路径"
+    description: "设备信息 → deviceId → console.info (aboutToAppear中)"
+    security_level: S4
+    leak_severity: MEDIUM
+    trigger: "Application startup"
+    flows:
+      - manufacturer (line 30) → deviceId (line 37) → console.info (line 39)
+      - brand (line 31) → deviceId (line 37) → console.info (line 39)
+      - productModel (line 32) → deviceId (line 37) → console.info (line 39)
+      - marketName (line 34) → deviceId (line 37) → console.info (line 39)
+      - osFullName (line 33) → deviceId (line 37) → console.info (line 39)
+    
+  path_2:
+    name: "初始化日志泄露路径"
+    description: "设备信息 → deviceId → hilog.info (aboutToAppear中)"
+    security_level: S4
+    leak_severity: MEDIUM
+    trigger: "Application startup"
+    flows:
+      - manufacturer (line 30) → deviceId (line 37) → hilog.info (line 39)
+      - brand (line 31) → deviceId (line 37) → hilog.info (line 39)
+      - productModel (line 32) → deviceId (line 37) → hilog.info (line 39)
+      - marketName (line 34) → deviceId (line 37) → hilog.info (line 39)
+      - osFullName (line 33) → deviceId (line 37) → hilog.info (line 39)
+    
+  path_3:
+    name: "点击触发的状态保持泄露路径 (主要泄漏)"
+    description: "设备信息 → deviceId → buttonHint → console.info (第2+次点击时)"
+    security_level: S4
+    leak_severity: HIGH
+    trigger: "Button onClick event (2nd+ click)"
+    flows:
+      - deviceId (line 37) → buttonHint (line 68) → buttonHint (line 63) → console.info
+    note: "按钮状态保持导致的延迟泄露"
+    
+  path_4:
+    name: "点击触发的系统日志泄露路径"
+    description: "设备信息 → deviceId → buttonHint → hilog.info (第2+次点击时)"
+    security_level: S4
+    leak_severity: HIGH
+    trigger: "Button onClick event (2nd+ click)"
+    flows:
+      - deviceId (line 37) → buttonHint (line 68) → buttonHint (line 62) → hilog.info
+    note: "敏感信息通过系统日志泄露"
+
+# ========================================
+# 数据流图 (Data Flow Graph)
+# ========================================
+
+data_flow_graph: |
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │              Application Startup (aboutToAppear)                │
+  │                                                                 │
+  │  [SOURCE] deviceInfo.manufacture (line 30) ──┐                │
+  │  [SOURCE] deviceInfo.brand (line 31) ────────┤                │
+  │  [SOURCE] deviceInfo.productModel (line 32) ─┤                │
+  │  [SOURCE] deviceInfo.marketName (line 34) ───┼──> [FLOW] Template Literal Concatenation
+  │  [SOURCE] deviceInfo.osFullName (line 33) ───┘    (line 37)   │
+  │                                                       │          │
+  │                                                       ↓          │
+  │                                          [STORAGE] this.deviceId
+  │                                              (private property)  │
+  │                                                       │          │
+  │                      ┌────────────────────────────────┤          │
+  │                      ↓                                ↓          │
+  │           [SINK] console.info              [SINK] hilog.info    │
+  │              (line 39)                          (line 39)       │
+  │             MEDIUM Severity                  MEDIUM Severity   │
+  │           Leaks on startup                   Leaks on startup  │
+  │                                                                 │
+  └─────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │          Button Click Events (sendMessage method)               │
+  │                                                                 │
+  │  1st Click:                                                    │
+  │  ═══════════                                                   │
+  │  [STORAGE] this.deviceId ──> [STORAGE] this.buttonHint        │
+  │  (line 18, sensitive)            (line 68, now sensitive)     │
+  │                                                                 │
+  │  2nd+ Clicks:                                                  │
+  │  ════════════                                                  │
+  │  if (this.buttonHint !== '')  ──> [Condition TRUE]            │
+  │  (line 61, check state)           (buttonHint contains data)  │
+  │                                           │                    │
+  │                      ┌────────────────────┼────────────────┐  │
+  │                      ↓                    ↓                ↓  │
+  │           [SINK] hilog.info      [SINK] console.info     │  │
+  │            (line 62)               (line 63)              │  │
+  │          HIGH Severity           HIGH Severity           │  │
+  │    Leaks on 2nd+ clicks       Leaks on 2nd+ clicks       │  │
+  │                                                                 │
+  │  Then: this.buttonHint = this.deviceId (line 68)              │
+  │        [State persists for next clicks]                       │
+  │                                                                 │
+  └─────────────────────────────────────────────────────────────────┘
+
+# ========================================
+# 安全级别说明 (Security Levels)
+# ========================================
+
+security_levels:
+  S1:
+    name: "公开数据"
+    description: "可以公开的数据,无敏感性"
+    examples: 
+      - "固定字符串 'unknown'"
+      - "空字符串初始值"
+      - "公开常量"
+    
+  S2:
+    name: "低敏感数据"
+    description: "一般性数据,泄露影响较小"
+    examples: 
+      - "电话号码格式"
+      - "一般配置参数"
+      - "公开的系统信息"
+    
+  S3:
+    name: "中敏感数据"
+    description: "包含一定敏感信息,需要保护"
+    examples: 
+      - "操作系统版本信息"
+      - "应用配置参数"
+      - "osFullName"
+    
+  S4:
+    name: "高敏感数据"
+    description: "高度敏感,泄露会造成严重影响"
+    examples: 
+      - "设备唯一标识符 (IMEI等)"
+      - "设备指纹信息"
+      - "设备品牌/型号/制造商组合"
+      - "个人隐私数据"
+      - "deviceId (组合的设备信息)"
+      - "buttonHint (包含敏感的deviceId)"
+
+# ========================================
+# 泄露严重级别 (Leak Severity)
+# ========================================
+
+leak_severity:
+  LOW:
+    description: "信息量少,影响有限"
+    examples: 
+      - "部分系统信息"
+    risk: "可能导致信息收集"
+    
+  MEDIUM:
+    description: "信息量中等,可能识别设备"
+    examples: 
+      - "单个系统属性"
+      - "日志输出"
+    risk: "可能导致隐私泄露"
+    
+  HIGH:
+    description: "完整设备标识信息,确定设备唯一性"
+    examples: 
+      - "完整deviceId输出"
+      - "多个设备属性组合"
+      - "控制台直接输出"
+    risk: "可能导致设备跟踪和隐私侵害"
+
+# ========================================
+# 关键问题分析 (Critical Issues)
+# ========================================
+
+critical_issues:
+  
+  issue_1:
+    id: "STATE_PERSISTENCE_LEAK"
+    severity: HIGH
+    title: "按钮状态持久化导致的延迟泄露"
+    description: |
+      按钮的状态 (buttonHint) 使用 @State 修饰,在多次点击之间保持不变。
+      这导致敏感信息在第1次点击时存储到状态,然后在第2+次点击时被输出到日志/控制台。
+      这是一个经典的"对象生命周期"泄露问题。
+    location: 
+      - line 22: "@State private buttonHint"
+      - line 68: "this.buttonHint = this.deviceId"
+      - line 61-63: "if (buttonHint !== '') { ... console.info ... }"
+    root_cause: "状态保持 + 条件输出"
+    impact: "第2次及以后的点击会泄露敏感的设备ID信息"
+    recommendation: "不应将敏感数据存储在UI状态变量中"
+    
+  issue_2:
+    id: "IMMEDIATE_STARTUP_LEAK"
+    severity: MEDIUM
+    title: "启动时立即泄露敏感信息"
+    description: |
+      在aboutToAppear生命周期方法中,立即将组合的敏感设备ID输出到console和hilog。
+      这在应用启动时就会泄露完整的设备指纹信息。
+    location: 
+      - line 37: "deviceId组合"
+      - line 39: "console.info输出"
+      - line 39: "hilog.info输出"
+    root_cause: "直接输出组合的敏感信息"
+    impact: "设备指纹信息在启动时立即可见"
+    recommendation: "不应该在日志中输出完整的设备标识信息"
+    
+  issue_3:
+    id: "SOURCE_TO_SINK_PATH"
+    severity: HIGH
+    title: "多条敏感数据流路径"
+    description: |
+      从系统API获取的敏感源信息(deviceInfo)通过模板字符串连接,流向多个sink点:
+      1. 启动时直接输出到console和hilog
+      2. 存储在deviceId属性中
+      3. 在按钮点击时流向buttonHint状态
+      4. 从buttonHint再次输出到console和hilog
+    location: 
+      sources: [30, 31, 32, 33, 34]
+      sinks: [39, 62, 63]
+    root_cause: "多个泄露点,缺少数据防护"
+    impact: "敏感信息有多个泄露渠道"
+    recommendation: "统一管理敏感数据,限制输出"
+    
+  issue_4:
+    id: "SENSITIVE_IN_STATE"
+    severity: HIGH
+    title: "在UI组件状态中存储敏感数据"
+    description: |
+      将敏感的设备ID信息存储在@State修饰的buttonHint属性中。
+      这样做会使敏感数据在组件生命周期内持续存在,并且可能被其他地方访问。
+    location: 
+      - line 22: "@State private buttonHint"
+      - line 68: "赋值敏感数据"
+    root_cause: "不适当地使用UI状态存储敏感信息"
+    impact: "敏感数据生命周期延长,泄露窗口扩大"
+    recommendation: "敏感数据应该在使用后立即清除,不应存储在UI状态中"
+
+# ========================================
+# 修复建议 (Recommendations)
+# ========================================
+
+recommendations:
+  
+  fix_1:
+    priority: CRITICAL
+    title: "移除敏感信息的UI状态存储"
+    description: "不应将敏感的deviceId存储在buttonHint状态中"
+    before: |
+      private sendMessage(): void {
+        if (this.buttonHint !== '') {
+          console.info('DroidBench: ' + this.buttonHint);
+        }
+        this.buttonHint = this.deviceId;  // 敏感数据进入状态
+      }
+    after: |
+      private sendMessage(): void {
+        // 不再通过UI状态泄露敏感信息
+        if (this.deviceId !== '') {
+          // 如果必须输出,应该进行脱敏处理
+          const maskedId = this.deviceId.substring(0, 5) + '****';
+          console.info('Device: ' + maskedId);
+        }
+      }
+    
+  fix_2:
+    priority: CRITICAL
+    title: "移除启动时的敏感信息输出"
+    description: "在aboutToAppear中不应直接输出完整的设备ID"
+    before: |
+      this.deviceId = `${manufacturer}-${brand}-${productModel}-${marketName}-${osFullName}`;
+      hilog.info(0x0000, 'DroidBench', 'Device Info obtained: %{public}s', this.deviceId);
+      console.info('Device Info obtained: ' + this.deviceId);
+    after: |
+      this.deviceId = `${manufacturer}-${brand}-${productModel}-${marketName}-${osFullName}`;
+      // 移除敏感信息的日志输出
+      // 如果必须记录,应该进行脱敏或加密
+      console.info('Device info initialized');
+    
+  fix_3:
+    priority: HIGH
+    title: "对输出到日志的敏感信息进行脱敏"
+    description: "任何必需的日志输出应该进行脱敏处理"
+    example: |
+      // 不好的做法
+      console.info('Device: ' + this.deviceId);
+      
+      // 好的做法
+      const maskedId = this.maskSensitiveData(this.deviceId);
+      console.info('Device: ' + maskedId);
+      
+      private maskSensitiveData(data: string): string {
+        if (data.length <= 4) return '****';
+        return data.substring(0, 2) + '****' + data.substring(data.length - 2);
+      }
+    
+  fix_4:
+    priority: HIGH
+    title: "清除敏感信息后立即销毁"
+    description: "使用敏感信息后应该立即清除"
+    example: |
+      private clearSensitiveData(): void {
+        this.deviceId = '';
+        this.buttonHint = '';
+      }
+
+# ========================================
+# 总结 (Summary)
+# ========================================
+
+summary:
+  total_sources: 5
+  total_sinks: 4
+  total_data_flow_paths: 4
+  critical_issues: 4
+  
+  vulnerability_count:
+    - source_to_sink: 4
+    - state_persistence: 1
+    - immediate_leak: 1
+    
+  overall_risk_level: "HIGH"
+  
+  key_findings: |
+    1. 设备ID信息从系统API源流向多个sink点 (console, hilog, UI状态)
+    2. 使用@State状态变量存储敏感信息导致状态持久化
+    3. 第1次点击将敏感信息存储到状态,第2+次点击输出到日志 - 延迟泄露
+    4. 启动时立即输出完整的设备指纹信息到日志
+    5. 多个泄露渠道缺乏统一的数据防护机制

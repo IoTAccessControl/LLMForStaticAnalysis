@@ -1,0 +1,465 @@
+# Button3 项目数据流分析
+# 分析日期: 2025年11月4日
+# 文件: entry/src/main/ets/pages/Index.ets
+
+target_var: deviceId 49
+other_vars: 
+  - manufacturer 52
+  - brand 53
+  - productModel 54
+  - osFullName 55
+  - marketName 56
+  - options 82
+  - content 85
+  - params 21
+  - message 66
+
+early_return:
+  - 61  # catch block 中的 error 处理
+  - 72  # sendCallback 中的 error 处理
+  - 79  # deliveryCallback 中的 error 处理
+    
+  # ============ 数据源 (SOURCE) ============
+  manufacturer 52:
+    description: "设备制造商信息 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.manufacture  # 系统API调用
+    controldep:
+      - Null 51  # try block
+    is_source: True
+    source_type: "Device Information"
+    
+  brand 53:
+    description: "设备品牌信息 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.brand  # 系统API调用
+    controldep:
+      - Null 51  # try block
+    is_source: True
+    source_type: "Device Information"
+    
+  productModel 54:
+    description: "设备产品型号 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.productModel  # 系统API调用
+    controldep:
+      - Null 51  # try block
+    is_source: True
+    source_type: "Device Information"
+    
+  osFullName 55:
+    description: "操作系统全名 (SOURCE)"
+    security_level: S3
+    type: "string"
+    datadep:
+      - deviceInfo.osFullName  # 系统API调用
+    controldep:
+      - Null 51  # try block
+    is_source: True
+    source_type: "System Information"
+    
+  marketName 56:
+    description: "设备市场名称 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.marketName  # 系统API调用
+    controldep:
+      - Null 51  # try block
+    is_source: True
+    source_type: "Device Information"
+    
+  # ============ 中间变量 ============
+  deviceId 57:
+    description: "组合后的设备ID字符串 (aboutToAppear 中赋值)"
+    security_level: S4
+    reset: False
+    datadep:
+      - manufacturer 52
+      - brand 53
+      - productModel 54
+      - marketName 56
+      - osFullName 55
+    controldep:
+      - Null 51  # try block
+    operation: "String concatenation"
+    
+  deviceId 61:
+    description: "异常情况下的默认值"
+    security_level: S1  # 公开数据 (固定字符串 'unknown')
+    reset: True
+    datadep: Null
+    controldep:
+      - error 59  # catch block
+      
+  # ============ @Builder 参数传递 ============
+  params 21:
+    description: "@Builder 函数参数对象 - 接收敏感数据"
+    security_level: S4
+    type: "ButtonLayoutParams"
+    datadep:
+      - deviceId 49  # 从主组件传入
+      - onSendClick 102  # 回调函数
+    controldep:
+      - build 91  # build 方法调用
+    is_data_carrier: True
+    
+  params.deviceId 26:
+    description: "@Builder 中使用的 deviceId (UI 显示)"
+    security_level: S4
+    type: "string"
+    is_sink_data: True
+    datadep:
+      - params 21  # 从参数中提取
+    controldep:
+      - IncludedButtonLayout 21
+    flows_to_sink: "Text UI Component"
+    
+  params.onSendClick 34:
+    description: "@Builder 中的回调函数引用"
+    security_level: S4
+    type: "() => void"
+    datadep:
+      - params 21
+    controldep:
+      - onClick 34  # Button onClick 事件
+    triggers: "sendMessage method"
+    
+  # ============ 控制流节点 ============
+  Null 51:
+    description: "try-catch 控制流入口 (aboutToAppear)"
+    reset: False
+    datadep: Null
+    controldep:
+      - aboutToAppear 50
+      
+  error 59:
+    description: "异常捕获 (aboutToAppear)"
+    reset: False
+    datadep: Null
+    controldep:
+      - Null 51  # try-catch block
+      
+  onClick 34:
+    description: "@Builder 中的按钮点击事件"
+    reset: False
+    datadep: Null
+    controldep:
+      - IncludedButtonLayout 21
+    triggers: "params.onSendClick()"
+      
+  # ============ SINK 相关变量 ============
+  message 66:
+    description: "Toast消息内容 - 直接引用 deviceId (SINK数据)"
+    security_level: S4
+    type: "string"
+    is_sink_data: True
+    datadep:
+      - deviceId 49  # 引用敏感数据
+    controldep:
+      - sendMessage 64  # sendMessage 方法
+    flows_to_sink: "promptAction.showToast"
+    
+  content 85:
+    description: "短信内容 - 直接引用 deviceId (SINK数据)"
+    security_level: S4
+    type: "string"
+    is_sink_data: True
+    datadep:
+      - deviceId 49  # 引用敏感数据
+    controldep:
+      - sendMessage 64  # sendMessage 方法
+    flows_to_sink: "sms.sendShortMessage"
+    
+  options 82:
+    description: "短信发送选项对象 (SINK容器)"
+    security_level: S4
+    type: "sms.SendMessageOptions"
+    is_sink_container: True
+    datadep:
+      - slotId 84       # SIM卡槽
+      - destinationHost 85  # 目标号码
+      - content 86      # 包含敏感数据
+      - sendCallback 87
+      - deliveryCallback 88
+    controldep:
+      - sendMessage 64
+    flows_to_sink: "sms.sendShortMessage"
+    
+  slotId 83:
+    description: "SIM卡槽ID"
+    security_level: S1
+    datadep: Null
+    controldep: Null
+    
+  destinationHost 85:
+    description: "目标电话号码 (+49 德国)"
+    security_level: S2
+    datadep: Null
+    controldep: Null
+    
+  sendCallback 69:
+    description: "短信发送回调函数"
+    security_level: S2
+    type: "(err: BusinessError, data: sms.ISendShortMessageCallback) => void"
+    datadep: Null
+    controldep:
+      - sendMessage 64
+      
+  deliveryCallback 76:
+    description: "短信送达回调函数"
+    security_level: S2
+    type: "(err: BusinessError, data: sms.IDeliveryShortMessageCallback) => void"
+    datadep: Null
+    controldep:
+      - sendMessage 64
+      
+# ========================================
+# 数据流路径 (Data Flow Paths)
+# ========================================
+
+data_flow_paths:
+  
+  path_1:
+    description: "设备信息 → deviceId → 短信发送 (主要泄漏路径)"
+    security_level: S4
+    leak_severity: HIGH
+    path_details: |
+      deviceInfo.* (lines 52-56) 
+        → this.deviceId (line 57)
+        → content (line 85)
+        → sms.sendShortMessage (line 89)
+        
+  path_2:
+    description: "设备信息 → deviceId → Toast UI 显示 (次要泄漏路径)"
+    security_level: S4
+    leak_severity: MEDIUM
+    path_details: |
+      deviceInfo.* (lines 52-56)
+        → this.deviceId (line 57)
+        → message (line 66)
+        → promptAction.showToast (line 65)
+        
+  path_3:
+    description: "设备信息 → @Builder 参数 → UI Text 显示 (UI 泄漏路径)"
+    security_level: S4
+    leak_severity: MEDIUM
+    path_details: |
+      deviceInfo.* (lines 52-56)
+        → this.deviceId (line 57)
+        → params.deviceId (line 103)
+        → Text component (line 26)
+        → UI 界面显示
+        
+  path_4:
+    description: "设备信息 → deviceId → 日志输出 (日志泄漏路径)"
+    security_level: S4
+    leak_severity: LOW
+    path_details: |
+      deviceInfo.* (lines 52-56)
+        → this.deviceId (line 57)
+        → console.info (line 58)
+
+# ========================================
+# 数据流图 (Data Flow Graph)
+# ========================================
+
+data_flow_graph: |
+  
+  [SOURCE] deviceInfo.manufacture (line 52) ──┐
+  [SOURCE] deviceInfo.brand (line 53) ────────┤
+  [SOURCE] deviceInfo.productModel (line 54) ─┤
+  [SOURCE] deviceInfo.osFullName (line 55) ───┼──> [FLOW] String concatenation (line 57)
+  [SOURCE] deviceInfo.marketName (line 56) ───┘           │
+                                                           ↓
+                                                  [STORAGE] this.deviceId (line 49)
+                                                           │
+                        ┌──────────────────────────────────┼──────────────────────────────────┐
+                        ↓                                  ↓                                  ↓
+              [FLOW] console.info              [FLOW] @Builder params         [FLOW] sendMessage method
+                   (line 58)                        (line 103)                      (line 64)
+                       │                                  │                              │
+                       ↓                                  ↓                              ↓
+                 [SINK] Log                    [SINK] Text UI Component      ┌──────────┴──────────┐
+                    Output                          (line 26)                ↓                     ↓
+                     LOW                         UI Display             [SINK] showToast    [SINK] sendShortMessage
+                                                   MEDIUM                  (line 65)            (line 89)
+                                                                            MEDIUM                HIGH
+                                                                          UI Leakage         Network Leakage
+
+# ========================================
+# 特殊分析: @Builder 数据传递
+# ========================================
+
+builder_data_flow:
+  description: "全局 @Builder 函数的数据传递机制"
+  
+  builder_invocation:
+    location: "line 101-104"
+    mechanism: "函数参数传递"
+    
+  data_transfer:
+    - source: "this.deviceId (line 49)"
+      destination: "params.deviceId (line 21)"
+      transfer_point: "line 103"
+      security_impact: "敏感数据通过参数传递到 UI 组件"
+      
+    - source: "this.sendMessage (method)"
+      destination: "params.onSendClick (callback)"
+      transfer_point: "line 102"
+      security_impact: "回调函数允许 @Builder 触发敏感操作"
+      
+  ui_exposure:
+    component: "Text"
+    location: "line 26"
+    content: "params.deviceId"
+    visibility: "屏幕可见"
+    severity: "MEDIUM"
+    description: "设备ID直接显示在UI界面上,可能被截屏或录屏捕获"
+
+# ========================================
+# 安全级别说明 (Security Levels)
+# ========================================
+
+security_levels:
+  S1:
+    name: "公开数据"
+    description: "可以公开的数据,无敏感性"
+    examples: ["固定字符串 'unknown'", "公开常量", "SIM卡槽ID"]
+    
+  S2:
+    name: "低敏感数据"
+    description: "一般性数据,泄露影响较小"
+    examples: ["电话号码格式", "回调函数", "一般配置参数"]
+    
+  S3:
+    name: "中敏感数据"
+    description: "包含一定敏感信息,需要保护"
+    examples: ["操作系统版本", "应用配置"]
+    
+  S4:
+    name: "高敏感数据"
+    description: "高度敏感,泄露会造成严重影响"
+    examples: ["设备唯一标识符", "设备指纹信息", "个人隐私数据", "组合设备信息"]
+
+# ========================================
+# 风险评估 (Risk Assessment)
+# ========================================
+
+risk_assessment:
+  
+  critical_risks:
+    - risk_id: "RISK-001"
+      severity: "HIGH"
+      category: "Network Data Leakage"
+      description: "设备指纹信息通过短信发送到国际号码"
+      affected_lines: [85, 89]
+      data_involved: "manufacturer, brand, productModel, marketName, osFullName"
+      sink: "sms.sendShortMessage"
+      recommendation: "移除短信发送功能或加密敏感数据"
+      
+    - risk_id: "RISK-002"
+      severity: "MEDIUM"
+      category: "UI Data Exposure"
+      description: "设备指纹信息直接显示在UI界面"
+      affected_lines: [26, 103]
+      data_involved: "deviceId"
+      sink: "Text UI Component"
+      recommendation: "避免在UI显示完整设备ID,考虑脱敏处理"
+      
+  medium_risks:
+    - risk_id: "RISK-003"
+      severity: "MEDIUM"
+      category: "Toast Leakage"
+      description: "设备信息通过Toast显示,可能被截屏"
+      affected_lines: [65-68]
+      data_involved: "deviceId"
+      sink: "promptAction.showToast"
+      recommendation: "避免在Toast中显示敏感信息"
+      
+  low_risks:
+    - risk_id: "RISK-004"
+      severity: "LOW"
+      category: "Log Leakage"
+      description: "设备信息写入系统日志"
+      affected_lines: [58]
+      data_involved: "deviceId"
+      sink: "console.info"
+      recommendation: "生产环境移除敏感日志输出"
+
+# ========================================
+# 控制流分析 (Control Flow Analysis)
+# ========================================
+
+control_flow:
+  
+  lifecycle_flow:
+    - stage: "Component Initialization"
+      method: "aboutToAppear"
+      lines: [50-62]
+      actions:
+        - "获取设备信息 (lines 52-56)"
+        - "组合设备ID (line 57)"
+        - "输出日志 (line 58)"
+        - "异常处理 (lines 59-61)"
+        
+    - stage: "UI Rendering"
+      method: "build"
+      lines: [91-115]
+      actions:
+        - "调用 @Builder 函数 (lines 101-104)"
+        - "传递敏感数据到UI组件"
+        
+    - stage: "User Interaction"
+      method: "sendMessage"
+      lines: [64-90]
+      trigger: "Button onClick (via @Builder callback)"
+      actions:
+        - "显示Toast (lines 65-68)"
+        - "定义回调函数 (lines 69-81)"
+        - "发送短信 (lines 82-89)"
+        
+  event_driven_flow:
+    - event: "onClick"
+      location: "line 34 (@Builder)"
+      handler: "params.onSendClick()"
+      actual_method: "this.sendMessage()"
+      trigger_location: "line 102"
+      description: "@Builder 通过回调触发主组件的敏感操作"
+
+# ========================================
+# 修复建议 (Remediation Recommendations)
+# ========================================
+
+remediation:
+  
+  immediate_actions:
+    - priority: "P0 - Critical"
+      action: "移除或禁用 sms.sendShortMessage 调用"
+      reason: "防止设备指纹通过网络泄漏"
+      affected_code: "lines 82-89"
+      
+    - priority: "P1 - High"
+      action: "对UI显示的 deviceId 进行脱敏处理"
+      reason: "防止完整设备信息暴露在界面"
+      affected_code: "lines 26, 103"
+      suggested_fix: "仅显示部分信息,如: `${deviceId.substring(0, 10)}...`"
+      
+  long_term_improvements:
+    - improvement: "实现数据加密机制"
+      description: "对敏感数据进行加密存储和传输"
+      
+    - improvement: "添加权限检查"
+      description: "在发送短信前检查用户权限和确认"
+      
+    - improvement: "日志脱敏"
+      description: "生产环境移除或脱敏敏感日志"
+      
+    - improvement: "数据最小化原则"
+      description: "仅收集和使用必要的设备信息"

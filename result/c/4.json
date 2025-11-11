@@ -1,0 +1,15 @@
+{
+  "InformationFlow": true,
+  "Trace": [
+    {
+      "from": ["s", 17],
+      "to":   ["s", 25, "use"],
+      "type": "data"
+    },
+    {
+      "from": ["s", 25, "use"],
+      "to":   ["oline", 31],
+      "type": "control"
+    }
+  ]
+}

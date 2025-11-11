@@ -1,0 +1,898 @@
+# Button2 项目数据流分析
+# 分析日期: 2025年11月4日
+# 文件: entry/src/main/ets/pages/Index.ets
+# 总行数: 168行
+
+target_var: deviceId 10
+other_vars: 
+  - manufacturer 67
+  - brand 68
+  - productModel 69
+  - osFullName 70
+  - marketName 71
+  - options 31
+  - content 34
+  - sendCallback 17
+  - deliveryCallback 24
+
+early_return:
+  - 20  # sendCallback 的 error 处理
+  - 27  # deliveryCallback 的 error 处理
+  - 83  # catch block 中的 error 处理
+
+# ========================================
+# 变量定义与数据依赖分析
+# ========================================
+
+variables:
+  
+  # ============ 目标变量 (敏感数据存储) ============
+  deviceId 10:
+    description: "类成员变量 - 存储设备敏感信息"
+    security_level: S4
+    type: "string"
+    scope: "class member"
+    initial_value: "''"
+    datadep: Null
+    controldep: Null
+    is_persistent: True
+    note: "贯穿整个生命周期的敏感数据存储"
+    
+  # ============ 数据源 (SOURCE) - Button3点击事件 ============
+  manufacturer 67:
+    description: "设备制造商信息 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.manufacture  # 系统API调用
+    controldep:
+      - try_block 65  # try-catch 控制流
+      - onClick_button3 153  # Button3点击事件
+    is_source: True
+    source_type: "Device Information"
+    api_call: "deviceInfo.manufacture"
+    
+  brand 68:
+    description: "设备品牌信息 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.brand  # 系统API调用
+    controldep:
+      - try_block 65
+      - onClick_button3 153
+    is_source: True
+    source_type: "Device Information"
+    api_call: "deviceInfo.brand"
+    
+  productModel 69:
+    description: "设备产品型号 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.productModel  # 系统API调用
+    controldep:
+      - try_block 65
+      - onClick_button3 153
+    is_source: True
+    source_type: "Device Information"
+    api_call: "deviceInfo.productModel"
+    
+  osFullName 70:
+    description: "操作系统全名 (SOURCE)"
+    security_level: S3
+    type: "string"
+    datadep:
+      - deviceInfo.osFullName  # 系统API调用
+    controldep:
+      - try_block 65
+      - onClick_button3 153
+    is_source: True
+    source_type: "System Information"
+    api_call: "deviceInfo.osFullName"
+    
+  marketName 71:
+    description: "设备市场名称 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.marketName  # 系统API调用
+    controldep:
+      - try_block 65
+      - onClick_button3 153
+    is_source: True
+    source_type: "Device Information"
+    api_call: "deviceInfo.marketName"
+    
+  # ============ 中间变量 - 数据聚合 ============
+  deviceId 73:
+    description: "组合后的设备ID字符串 (在Button3中赋值)"
+    security_level: S4
+    reset: False
+    datadep:
+      - manufacturer 67
+      - brand 68
+      - productModel 69
+      - marketName 71
+      - osFullName 70
+    controldep:
+      - try_block 65
+      - onClick_button3 153
+    operation: "String template concatenation"
+    flows_to: "this.deviceId 10"
+    
+  deviceId 83:
+    description: "异常情况下的重置 (在Button3的catch中)"
+    security_level: S1  # 空字符串
+    reset: True
+    datadep: Null
+    controldep:
+      - catch_block 81
+      - onClick_button3 153
+    flows_to: "this.deviceId 10"
+    
+  deviceId 51:
+    description: "Button2中的重置"
+    security_level: S1  # 空字符串
+    reset: True
+    datadep: Null
+    controldep:
+      - onClick_button2 144
+    flows_to: "this.deviceId 10"
+    note: "安全操作 - 清空敏感数据"
+    
+  deviceId 44:
+    description: "Button1中发送后的重置"
+    security_level: S1  # 空字符串
+    reset: True
+    datadep: Null
+    controldep:
+      - onClick_button1 135
+    flows_to: "this.deviceId 10"
+    note: "已泄露后的清理"
+    
+  # ============ SINK 相关变量 - Button1 (发送短信) ============
+  sendCallback 17:
+    description: "短信发送回调函数"
+    security_level: S2
+    type: "function"
+    datadep: Null
+    controldep:
+      - onClick_button1 135
+    
+  deliveryCallback 24:
+    description: "短信送达回调函数"
+    security_level: S2
+    type: "function"
+    datadep: Null
+    controldep:
+      - onClick_button1 135
+    
+  content 34:
+    description: "短信内容 - 直接引用 deviceId (SINK数据)"
+    security_level: S4
+    type: "string"
+    is_sink_data: True
+    datadep:
+      - deviceId 10  # 引用敏感数据
+    controldep:
+      - onClick_button1 135  # 按钮点击事件
+    flows_to_sink: "sms.sendShortMessage"
+    leak_type: "Network Transmission"
+    
+  options 31:
+    description: "短信发送选项对象 (SINK容器)"
+    security_level: S4
+    type: "sms.SendMessageOptions"
+    is_sink_container: True
+    datadep:
+      - slotId 32
+      - destinationHost 33
+      - content 34      # 包含敏感数据
+      - sendCallback 17
+      - deliveryCallback 24
+    controldep:
+      - onClick_button1 135
+    flows_to_sink: "sms.sendShortMessage (line 39)"
+    
+  slotId 32:
+    description: "SIM卡槽ID"
+    security_level: S1
+    type: "number"
+    datadep: Null
+    controldep: Null
+    value: 0
+    
+  destinationHost 33:
+    description: "目标电话号码"
+    security_level: S2
+    type: "string"
+    datadep: Null
+    controldep: Null
+    value: "'+49 1234'"
+    
+  # ============ SINK - Button3 (日志泄露) ============
+  hilog_param_75 75:
+    description: "hilog日志参数 - Button3中的立即泄露"
+    security_level: S4
+    is_sink_data: True
+    datadep:
+      - deviceId 10
+    controldep:
+      - try_block 65
+      - onClick_button3 153
+    flows_to_sink: "hilog.info (line 75)"
+    leak_type: "Log Leakage"
+    leak_severity: MEDIUM
+    
+  console_param_76 76:
+    description: "console日志参数 - Button3中的立即泄露"
+    security_level: S4
+    is_sink_data: True
+    datadep:
+      - deviceId 10
+    controldep:
+      - try_block 65
+      - onClick_button3 153
+    flows_to_sink: "console.info (line 76)"
+    leak_type: "Log Leakage"
+    leak_severity: LOW
+    
+  # ============ SINK - Button1 (日志泄露) ============
+  hilog_param_41 41:
+    description: "hilog日志参数 - Button1中的泄露"
+    security_level: S4
+    is_sink_data: True
+    datadep:
+      - deviceId 10
+    controldep:
+      - onClick_button1 135
+    flows_to_sink: "hilog.info (line 41)"
+    leak_type: "Log Leakage"
+    leak_severity: MEDIUM
+    
+  console_param_42 42:
+    description: "console日志参数 - Button1中的泄露"
+    security_level: S4
+    is_sink_data: True
+    datadep:
+      - deviceId 10
+    controldep:
+      - onClick_button1 135
+    flows_to_sink: "console.info (line 42)"
+    leak_type: "Log Leakage"
+    leak_severity: LOW
+    
+  # ============ SINK - Button2 (无泄露 - 已清空) ============
+  hilog_param_53 53:
+    description: "hilog日志参数 - Button2中无泄露 (已清空)"
+    security_level: S1
+    is_sink_data: False
+    datadep:
+      - deviceId 51  # 已被清空
+    controldep:
+      - onClick_button2 144
+    flows_to_sink: "hilog.info (line 53)"
+    leak_type: "No Leak"
+    note: "deviceId已在line 51被清空"
+    
+  console_param_54 54:
+    description: "console日志参数 - Button2中无泄露 (已清空)"
+    security_level: S1
+    is_sink_data: False
+    datadep:
+      - deviceId 51  # 已被清空
+    controldep:
+      - onClick_button2 144
+    flows_to_sink: "console.info (line 54)"
+    leak_type: "No Leak"
+    
+  # ============ 控制流节点 ============
+  onClick_button1 135:
+    description: "Button 1 点击事件处理器"
+    reset: False
+    datadep: Null
+    controldep:
+      - user_interaction  # 用户交互
+    event_type: "onClick"
+    
+  onClick_button2 144:
+    description: "Button 2 点击事件处理器"
+    reset: False
+    datadep: Null
+    controldep:
+      - user_interaction
+    event_type: "onClick"
+    
+  onClick_button3 153:
+    description: "Button 3 点击事件处理器"
+    reset: False
+    datadep: Null
+    controldep:
+      - user_interaction
+    event_type: "onClick"
+    
+  try_block 65:
+    description: "try-catch 控制流入口 (Button3)"
+    reset: False
+    datadep: Null
+    controldep:
+      - onClick_button3 153
+      
+  catch_block 81:
+    description: "异常捕获 (Button3)"
+    reset: False
+    datadep: Null
+    controldep:
+      - try_block 65
+
+# ========================================
+# 数据流路径 (Data Flow Paths)
+# ========================================
+
+data_flow_paths:
+  
+  path_1_sms_leak:
+    description: "设备信息 → deviceId → 短信发送 (主要泄漏路径)"
+    security_level: S4
+    leak_severity: CRITICAL
+    leak_type: "Network Transmission"
+    steps:
+      - step: 1
+        line: 67-71
+        action: "获取设备信息 (SOURCE)"
+        variables: ["manufacturer", "brand", "productModel", "osFullName", "marketName"]
+        triggered_by: "Button3 onClick"
+      - step: 2
+        line: 73
+        action: "组合设备信息到 deviceId"
+        variables: ["deviceId"]
+        operation: "String concatenation"
+      - step: 3
+        line: 34
+        action: "将 deviceId 赋值给短信内容"
+        variables: ["content"]
+        triggered_by: "Button1 onClick"
+      - step: 4
+        line: 31-36
+        action: "构造短信选项对象"
+        variables: ["options"]
+      - step: 5
+        line: 39
+        action: "发送短信 (SINK)"
+        sink_function: "sms.sendShortMessage"
+        leak_confirmed: True
+    precondition: "必须先点击 Button3 (获取数据),再点击 Button1 (发送数据)"
+    impact: "设备指纹信息通过网络发送到外部号码,严重隐私泄露"
+        
+  path_2_hilog_button3:
+    description: "设备信息 → deviceId → hilog输出 (Button3中立即泄露)"
+    security_level: S4
+    leak_severity: MEDIUM
+    leak_type: "Log Leakage"
+    steps:
+      - step: 1
+        line: 67-71
+        action: "获取设备信息 (SOURCE)"
+        variables: ["manufacturer", "brand", "productModel", "osFullName", "marketName"]
+        triggered_by: "Button3 onClick"
+      - step: 2
+        line: 73
+        action: "组合设备信息到 deviceId"
+        variables: ["deviceId"]
+      - step: 3
+        line: 75
+        action: "hilog输出 (SINK)"
+        sink_function: "hilog.info"
+        leak_confirmed: True
+    precondition: "点击 Button3 即触发"
+    impact: "设备信息泄露到系统日志,可能被其他应用读取"
+    
+  path_3_console_button3:
+    description: "设备信息 → deviceId → console输出 (Button3中立即泄露)"
+    security_level: S4
+    leak_severity: LOW
+    leak_type: "Log Leakage"
+    steps:
+      - step: 1
+        line: 67-71
+        action: "获取设备信息 (SOURCE)"
+        variables: ["manufacturer", "brand", "productModel", "osFullName", "marketName"]
+        triggered_by: "Button3 onClick"
+      - step: 2
+        line: 73
+        action: "组合设备信息到 deviceId"
+        variables: ["deviceId"]
+      - step: 3
+        line: 76
+        action: "console输出 (SINK)"
+        sink_function: "console.info"
+        leak_confirmed: True
+    precondition: "点击 Button3 即触发"
+    impact: "设备信息泄露到控制台日志"
+    
+  path_4_hilog_button1:
+    description: "设备信息 → deviceId → hilog输出 (Button1中泄露)"
+    security_level: S4
+    leak_severity: MEDIUM
+    leak_type: "Log Leakage"
+    steps:
+      - step: 1
+        line: 67-71
+        action: "获取设备信息 (SOURCE)"
+        variables: ["manufacturer", "brand", "productModel", "osFullName", "marketName"]
+        triggered_by: "Button3 onClick"
+      - step: 2
+        line: 73
+        action: "组合设备信息到 deviceId"
+        variables: ["deviceId"]
+      - step: 3
+        line: 41
+        action: "hilog输出 (SINK)"
+        sink_function: "hilog.info"
+        leak_confirmed: True
+        triggered_by: "Button1 onClick"
+    precondition: "必须先点击 Button3,再点击 Button1"
+    impact: "设备信息泄露到系统日志"
+    
+  path_5_console_button1:
+    description: "设备信息 → deviceId → console输出 (Button1中泄露)"
+    security_level: S4
+    leak_severity: LOW
+    leak_type: "Log Leakage"
+    steps:
+      - step: 1
+        line: 67-71
+        action: "获取设备信息 (SOURCE)"
+        variables: ["manufacturer", "brand", "productModel", "osFullName", "marketName"]
+        triggered_by: "Button3 onClick"
+      - step: 2
+        line: 73
+        action: "组合设备信息到 deviceId"
+        variables: ["deviceId"]
+      - step: 3
+        line: 42
+        action: "console输出 (SINK)"
+        sink_function: "console.info"
+        leak_confirmed: True
+        triggered_by: "Button1 onClick"
+    precondition: "必须先点击 Button3,再点击 Button1"
+    impact: "设备信息泄露到控制台日志"
+    
+  path_6_no_leak_button2:
+    description: "Button2 清空数据 - 无泄露路径"
+    security_level: S1
+    leak_severity: NONE
+    leak_type: "No Leak"
+    steps:
+      - step: 1
+        line: 51
+        action: "清空 deviceId"
+        variables: ["deviceId"]
+        triggered_by: "Button2 onClick"
+      - step: 2
+        line: 53-54
+        action: "日志输出空字符串"
+        sink_function: "hilog.info / console.info"
+        leak_confirmed: False
+    precondition: "点击 Button2"
+    impact: "无数据泄露,安全操作"
+
+# ========================================
+# 数据流图 (Data Flow Graph)
+# ========================================
+
+data_flow_graph: |
+  
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                    Button3 onClick (line 153)                   │
+  │                    获取设备信息 (SOURCE)                        │
+  └─────────────────────────────────────────────────────────────────┘
+                                    ↓
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  [SOURCE] deviceInfo.manufacture (line 67)      ────┐           │
+  │  [SOURCE] deviceInfo.brand (line 68)            ────┤           │
+  │  [SOURCE] deviceInfo.productModel (line 69)     ────┼──────┐    │
+  │  [SOURCE] deviceInfo.osFullName (line 70)       ────┤      │    │
+  │  [SOURCE] deviceInfo.marketName (line 71)       ────┘      │    │
+  └─────────────────────────────────────────────────────────────────┘
+                                                                 ↓
+                        ┌──────────────────────────────────────────┐
+                        │ [FLOW] String concatenation (line 73)    │
+                        │        this.deviceId = `${...}`          │
+                        └──────────────────────────────────────────┘
+                                         ↓
+                        ┌──────────────────────────────────────────┐
+                        │ [STORAGE] this.deviceId (line 10)        │
+                        │           Security Level: S4             │
+                        └──────────────────────────────────────────┘
+                                         ↓
+        ┌────────────────────────────────┼────────────────────────────────┐
+        ↓                                ↓                                ↓
+  ┌──────────┐                    ┌──────────┐                    ┌──────────┐
+  │ Button3  │                    │ Button1  │                    │ Button2  │
+  │ onClick  │                    │ onClick  │                    │ onClick  │
+  └──────────┘                    └──────────┘                    └──────────┘
+        ↓                                ↓                                ↓
+  ┌──────────────────┐          ┌─────────────────────┐          ┌──────────────────┐
+  │ 立即泄露到日志   │          │ 1. 短信发送 (line39)│          │ 1. 清空 (line 51)│
+  │ - hilog (line 75)│          │ 2. 日志 (line 41-42)│          │ 2. 日志 (line 53-54)│
+  │ - console (line76)│          │ 3. 清空 (line 44)   │          │    输出空字符串  │
+  └──────────────────┘          └─────────────────────┘          └──────────────────┘
+      MEDIUM/LOW                   CRITICAL/MEDIUM/LOW                  NO LEAK
+      
+  ═══════════════════════════════════════════════════════════════════════════════
+  
+  泄露汇总:
+  ┌─────────────────┬──────────────┬──────────────┬─────────────────────────┐
+  │ Sink Type       │ Location     │ Severity     │ Precondition            │
+  ├─────────────────┼──────────────┼──────────────┼─────────────────────────┤
+  │ SMS Send        │ Line 39      │ CRITICAL     │ Button3 → Button1       │
+  │ hilog (Button3) │ Line 75      │ MEDIUM       │ Button3                 │
+  │ console (B3)    │ Line 76      │ LOW          │ Button3                 │
+  │ hilog (Button1) │ Line 41      │ MEDIUM       │ Button3 → Button1       │
+  │ console (B1)    │ Line 42      │ LOW          │ Button3 → Button1       │
+  │ Button2 outputs │ Line 53-54   │ NONE         │ Safe (已清空)           │
+  └─────────────────┴──────────────┴──────────────┴─────────────────────────┘
+
+# ========================================
+# 泄露场景分析 (Leak Scenarios)
+# ========================================
+
+leak_scenarios:
+  
+  scenario_1:
+    name: "主要泄露场景 - 短信发送"
+    severity: CRITICAL
+    attack_sequence:
+      - "用户点击 Button 3 (获取设备信息)"
+      - "用户点击 Button 1 (发送短信)"
+    data_flow:
+      - "deviceInfo APIs → manufacturer, brand, productModel, osFullName, marketName"
+      - "String concatenation → this.deviceId"
+      - "this.deviceId → options.content"
+      - "options → sms.sendShortMessage()"
+    leaked_data:
+      - "设备制造商"
+      - "设备品牌"
+      - "产品型号"
+      - "操作系统全名"
+      - "市场名称"
+    destination: "外部电话号码 (+49 1234)"
+    impact: "设备指纹信息通过网络传输,可用于设备追踪和用户识别"
+    cvss_score: 7.5
+    
+  scenario_2:
+    name: "次要泄露场景 - 日志泄露 (Button3)"
+    severity: MEDIUM
+    attack_sequence:
+      - "用户点击 Button 3 (获取设备信息)"
+    data_flow:
+      - "deviceInfo APIs → this.deviceId"
+      - "this.deviceId → hilog.info() / console.info()"
+    leaked_data:
+      - "完整设备指纹信息"
+    destination: "系统日志 / 控制台日志"
+    impact: "其他应用可能读取系统日志,获取设备信息"
+    cvss_score: 5.3
+    
+  scenario_3:
+    name: "次要泄露场景 - 日志泄露 (Button1)"
+    severity: MEDIUM
+    attack_sequence:
+      - "用户点击 Button 3 (获取设备信息)"
+      - "用户点击 Button 1 (发送短信)"
+    data_flow:
+      - "this.deviceId → hilog.info() / console.info() (在短信发送前)"
+    leaked_data:
+      - "完整设备指纹信息"
+    destination: "系统日志 / 控制台日志"
+    impact: "日志文件可能被恶意读取"
+    cvss_score: 5.3
+    
+  scenario_4:
+    name: "安全场景 - Button2 清空数据"
+    severity: NONE
+    attack_sequence:
+      - "用户点击 Button 2"
+    data_flow:
+      - "deviceId = '' (清空)"
+      - "空字符串 → hilog.info() / console.info()"
+    leaked_data: []
+    destination: "无"
+    impact: "无数据泄露,安全操作"
+    cvss_score: 0.0
+
+# ========================================
+# 控制流依赖分析
+# ========================================
+
+control_dependencies:
+  
+  user_interactions:
+    - button: "Button 1"
+      function: "onButton1Click()"
+      lines: "15-45"
+      actions:
+        - "发送包含 deviceId 的短信 (SINK)"
+        - "输出 deviceId 到日志 (SINK)"
+        - "清空 deviceId"
+      data_dependency: "依赖于 this.deviceId 的当前值"
+      leak_risk: "HIGH (如果 deviceId 包含敏感数据)"
+      
+    - button: "Button 2"
+      function: "onButton2Click()"
+      lines: "49-60"
+      actions:
+        - "清空 deviceId"
+        - "输出空字符串到日志 (安全)"
+      data_dependency: "无"
+      leak_risk: "NONE"
+      
+    - button: "Button 3"
+      function: "onButton3Click()"
+      lines: "65-86"
+      actions:
+        - "获取设备信息 (SOURCE)"
+        - "组合信息到 deviceId"
+        - "立即输出到日志 (SINK)"
+      data_dependency: "deviceInfo APIs"
+      leak_risk: "MEDIUM (立即泄露到日志)"
+      
+  event_ordering:
+    critical_sequence:
+      - "Button 3 → Button 1: 导致完整的数据泄露链 (SOURCE → STORAGE → SINK)"
+    safe_sequences:
+      - "Button 2 only: 清空数据,无泄露"
+      - "Button 1 only (未先点击 Button 3): 发送空字符串,无泄露"
+      - "Button 3 → Button 2: 获取后立即清空,仅日志泄露"
+      - "Button 3 → Button 2 → Button 1: Button1 发送空字符串,无短信泄露"
+
+# ========================================
+# 安全级别说明 (Security Levels)
+# ========================================
+
+security_levels:
+  S1:
+    name: "公开数据"
+    description: "可以公开的数据,无敏感性"
+    examples: 
+      - "空字符串 ''"
+      - "固定的UI文本"
+      - "公开常量"
+    data_handling: "无限制"
+    
+  S2:
+    name: "低敏感数据"
+    description: "一般性数据,泄露影响较小"
+    examples: 
+      - "电话号码格式"
+      - "一般配置参数"
+      - "回调函数引用"
+    data_handling: "可以记录日志,但不应传输"
+    
+  S3:
+    name: "中敏感数据"
+    description: "包含一定敏感信息,需要保护"
+    examples: 
+      - "操作系统版本"
+      - "应用配置"
+      - "系统信息"
+    data_handling: "需加密存储,限制日志输出"
+    
+  S4:
+    name: "高敏感数据"
+    description: "高度敏感,泄露会造成严重影响"
+    examples: 
+      - "设备唯一标识符 (manufacture, brand, model)"
+      - "设备指纹信息"
+      - "用户隐私数据"
+      - "组合的设备信息"
+    data_handling: "严格加密,禁止日志记录,需用户授权传输"
+
+# ========================================
+# SINK 函数分类
+# ========================================
+
+sink_functions:
+  
+  network_sinks:
+    - function: "sms.sendShortMessage"
+      location: "line 39"
+      severity: CRITICAL
+      description: "发送短信到外部号码"
+      leaked_data: "options.content (包含 deviceId)"
+      mitigation: "禁止发送敏感设备信息,或需用户明确授权"
+      
+  log_sinks:
+    - function: "hilog.info"
+      locations: [75, 41, 53]
+      severity: MEDIUM
+      description: "系统日志输出"
+      leaked_data: "deviceId (line 75, 41) / 空字符串 (line 53)"
+      mitigation: "使用 %{private}s 而非 %{public}s 标记敏感数据"
+      
+    - function: "console.info"
+      locations: [76, 42, 54]
+      severity: LOW
+      description: "控制台日志输出"
+      leaked_data: "deviceId (line 76, 42) / 空字符串 (line 54)"
+      mitigation: "生产环境移除 console 日志,或脱敏处理"
+      
+  ui_sinks:
+    - function: "promptAction.showToast"
+      locations: [55, 77]
+      severity: NONE
+      description: "Toast 消息提示"
+      leaked_data: "固定文本消息 (无敏感数据)"
+      mitigation: "当前安全,但需注意不要在 Toast 中显示敏感数据"
+
+# ========================================
+# 修复建议 (Remediation)
+# ========================================
+
+remediation:
+  
+  critical_fixes:
+    - issue: "短信发送泄露设备信息"
+      location: "line 34, 39"
+      severity: CRITICAL
+      recommendation: "删除或注释 sms.sendShortMessage 调用,或使用脱敏数据"
+      code_change: |
+        # 修改前:
+        content: this.deviceId, // sink, potential leak
+        
+        # 修改后 (选项1 - 禁用):
+        // content: this.deviceId, // DISABLED for security
+        content: 'Test message', // 使用测试数据
+        
+        # 修改后 (选项2 - 脱敏):
+        content: this.deviceId.substring(0, 4) + '***', // 部分脱敏
+        
+  high_priority_fixes:
+    - issue: "日志输出泄露设备信息"
+      location: "line 75, 76, 41, 42"
+      severity: HIGH
+      recommendation: "使用私有日志标记或移除敏感数据日志"
+      code_change: |
+        # 修改前:
+        hilog.info(0x0000, 'TAG', 'Button3: %{public}s', this.deviceId);
+        
+        # 修改后:
+        hilog.info(0x0000, 'TAG', 'Button3: %{private}s', this.deviceId);
+        // 或者
+        hilog.info(0x0000, 'TAG', 'Button3: Device info collected');
+        
+  medium_priority_fixes:
+    - issue: "设备信息获取未经用户授权"
+      location: "line 67-71"
+      severity: MEDIUM
+      recommendation: "添加隐私授权提示,获得用户同意后再收集"
+      code_change: |
+        // 添加权限检查和用户授权流程
+        private async onButton3Click(): Promise<void> {
+          try {
+            // 1. 检查权限
+            // 2. 请求用户授权
+            // 3. 获取设备信息
+            // ...
+          } catch (error) {
+            // ...
+          }
+        }
+        
+  best_practices:
+    - "使用数据脱敏技术处理敏感信息"
+    - "日志中使用 %{private}s 标记敏感数据"
+    - "生产环境禁用 console 日志"
+    - "网络传输前加密敏感数据"
+    - "实现最小权限原则,仅收集必要的设备信息"
+    - "添加用户隐私政策和授权流程"
+
+# ========================================
+# 测试用例 (Test Cases)
+# ========================================
+
+test_cases:
+  
+  leak_confirmation_tests:
+    - test_id: "TC001"
+      name: "短信泄露测试"
+      steps:
+        - "点击 Button 3"
+        - "点击 Button 1"
+      expected_result: "deviceId 通过短信发送 (泄露确认)"
+      actual_behavior: "LEAK CONFIRMED"
+      
+    - test_id: "TC002"
+      name: "日志泄露测试 (Button3)"
+      steps:
+        - "点击 Button 3"
+        - "查看日志输出"
+      expected_result: "deviceId 输出到 hilog 和 console (泄露确认)"
+      actual_behavior: "LEAK CONFIRMED"
+      
+    - test_id: "TC003"
+      name: "日志泄露测试 (Button1)"
+      steps:
+        - "点击 Button 3"
+        - "点击 Button 1"
+        - "查看日志输出"
+      expected_result: "deviceId 输出到 hilog 和 console (泄露确认)"
+      actual_behavior: "LEAK CONFIRMED"
+      
+  safe_path_tests:
+    - test_id: "TC004"
+      name: "Button2 安全测试"
+      steps:
+        - "点击 Button 3"
+        - "点击 Button 2"
+        - "查看日志输出"
+      expected_result: "日志输出空字符串 (无泄露)"
+      actual_behavior: "NO LEAK"
+      
+    - test_id: "TC005"
+      name: "仅点击 Button1 (无数据)"
+      steps:
+        - "点击 Button 1 (不先点击 Button3)"
+        - "检查短信内容和日志"
+      expected_result: "发送空字符串 (无泄露)"
+      actual_behavior: "NO LEAK"
+      
+    - test_id: "TC006"
+      name: "清空后发送测试"
+      steps:
+        - "点击 Button 3"
+        - "点击 Button 2"
+        - "点击 Button 1"
+      expected_result: "发送空字符串 (无泄露)"
+      actual_behavior: "NO LEAK"
+
+# ========================================
+# 总结 (Summary)
+# ========================================
+
+summary:
+  total_sources: 5
+  source_list:
+    - "deviceInfo.manufacture (line 67)"
+    - "deviceInfo.brand (line 68)"
+    - "deviceInfo.productModel (line 69)"
+    - "deviceInfo.osFullName (line 70)"
+    - "deviceInfo.marketName (line 71)"
+    
+  total_sinks: 6
+  sink_list:
+    - "sms.sendShortMessage (line 39) - CRITICAL"
+    - "hilog.info (line 75) - MEDIUM"
+    - "console.info (line 76) - LOW"
+    - "hilog.info (line 41) - MEDIUM"
+    - "console.info (line 42) - LOW"
+    - "hilog.info/console.info (line 53-54) - SAFE"
+    
+  total_leak_paths: 5
+  leak_path_list:
+    - "Path 1: SMS Leak (CRITICAL)"
+    - "Path 2: hilog Button3 Leak (MEDIUM)"
+    - "Path 3: console Button3 Leak (LOW)"
+    - "Path 4: hilog Button1 Leak (MEDIUM)"
+    - "Path 5: console Button1 Leak (LOW)"
+    
+  risk_assessment:
+    overall_risk: HIGH
+    critical_risks: 1
+    high_risks: 2
+    medium_risks: 2
+    low_risks: 2
+    
+  key_findings:
+    - "存在严重的设备信息泄露风险 (通过短信发送)"
+    - "设备指纹信息可被用于用户追踪和识别"
+    - "多个日志泄露点,可能被恶意应用利用"
+    - "Button2 提供了安全的数据清空机制"
+    - "事件顺序依赖导致泄露场景复杂化"
+    
+  compliance_issues:
+    - "违反 GDPR - 未经用户同意收集和传输设备信息"
+    - "违反 HarmonyOS 隐私规范 - 日志输出敏感数据应使用 private 标记"
+    - "缺少隐私政策和用户授权流程"

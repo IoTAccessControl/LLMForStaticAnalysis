@@ -1,0 +1,229 @@
+# Button1 项目数据流分析
+# 分析日期: 2025年11月4日
+# 文件: entry/src/main/ets/pages/Index.ets
+
+target_var: deviceId 10
+other_vars: 
+  - manufacturer 18
+  - brand 19
+  - productModel 20
+  - marketName 21
+  - osFullName 22
+  - options 56
+  - content 59
+
+early_return:
+  - 28  # catch block 中的 error 处理
+    
+  # ============ 数据源 (SOURCE) ============
+  manufacturer 18:
+    description: "设备制造商信息 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.manufacture  # 系统API调用
+    controldep:
+      - Null 15  # try block
+    is_source: True
+    source_type: "Device Information"
+    
+  brand 19:
+    description: "设备品牌信息 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.brand  # 系统API调用
+    controldep:
+      - Null 15  # try block
+    is_source: True
+    source_type: "Device Information"
+    
+  productModel 20:
+    description: "设备产品型号 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.productModel  # 系统API调用
+    controldep:
+      - Null 15  # try block
+    is_source: True
+    source_type: "Device Information"
+    
+  marketName 21:
+    description: "设备市场名称 (SOURCE)"
+    security_level: S4
+    type: "string"
+    datadep:
+      - deviceInfo.marketName  # 系统API调用
+    controldep:
+      - Null 15  # try block
+    is_source: True
+    source_type: "Device Information"
+    
+  osFullName 22:
+    description: "操作系统全名 (SOURCE)"
+    security_level: S3
+    type: "string"
+    datadep:
+      - deviceInfo.osFullName  # 系统API调用
+    controldep:
+      - Null 15  # try block
+    is_source: True
+    source_type: "System Information"
+    
+  # ============ 中间变量 ============
+  deviceId 24:
+    description: "组合后的设备ID字符串"
+    security_level: S4
+    reset: False
+    datadep:
+      - manufacturer 18
+      - brand 19
+      - productModel 20
+      - marketName 21
+      - osFullName 22
+    controldep:
+      - Null 15  # try block
+    operation: "String concatenation"
+    
+  deviceId 28:
+    description: "异常情况下的默认值"
+    security_level: S1  # 公开数据 (固定字符串 'unknown')
+    reset: True
+    datadep: Null
+    controldep:
+      - error 26  # catch block
+    
+  # ============ 控制流节点 ============
+  Null 15:
+    description: "try-catch 控制流入口"
+    reset: False
+    datadep: Null
+    controldep:
+      - Null 15  # 自引用
+      
+  error 26:
+    description: "异常捕获"
+    reset: False
+    datadep: Null
+    controldep:
+      - Null 15  # try-catch block
+      
+  # ============ SINK 相关变量 ============
+  content 59:
+    description: "短信内容 - 直接引用 deviceId (SINK数据)"
+    security_level: S4
+    type: "string"
+    is_sink_data: True
+    datadep:
+      - deviceId 10  # 引用敏感数据
+    controldep:
+      - onClick 85  # 按钮点击事件
+    flows_to_sink: "sms.sendShortMessage"
+    
+  options 56:
+    description: "短信发送选项对象 (SINK容器)"
+    security_level: S4
+    type: "sms.SendMessageOptions"
+    is_sink_container: True
+    datadep:
+      - content 59      # 包含敏感数据
+      - slotId 57       # SIM卡槽
+      - destinationHost 58  # 目标号码
+      - sendCallback 60
+      - deliveryCallback 61
+    controldep:
+      - onClick 85
+    flows_to_sink: "sms.sendShortMessage"
+    
+  slotId 57:
+    description: "SIM卡槽ID"
+    security_level: S1
+    datadep: Null
+    controldep: Null
+    
+  destinationHost 58:
+    description: "目标电话号码"
+    security_level: S2
+    datadep: Null
+    controldep: Null
+    
+  message 37:
+    description: "Toast消息内容 - 直接引用 deviceId (SINK数据)"
+    security_level: S4
+    type: "string"
+    is_sink_data: True
+    datadep:
+      - deviceId 10  # 引用敏感数据
+    controldep:
+      - onClick 85
+    flows_to_sink: "promptAction.showToast"
+    
+  onClick 85:
+    description: "按钮点击事件处理器"
+    reset: False
+    datadep: Null
+    controldep:
+      - onClick 85  # 事件循环
+      
+# ========================================
+# 数据流路径 (Data Flow Paths)
+# ========================================
+
+data_flow_paths:
+  
+  path_1:
+    description: "设备信息 → deviceId → 短信发送 (主要泄漏路径)"
+    security_level: S4
+    leak_severity: HIGH
+        
+  path_2:
+    description: "设备信息 → deviceId → 日志输出 (次要泄漏路径)"
+    security_level: S4
+    leak_severity: MEDIUM
+
+# ========================================
+# 数据流图 (Data Flow Graph)
+# ========================================
+
+data_flow_graph: |
+  
+  [SOURCE] deviceInfo.manufacture (line 18) ──┐
+  [SOURCE] deviceInfo.brand (line 19) ────────┤
+  [SOURCE] deviceInfo.productModel (line 20) ─┤
+  [SOURCE] deviceInfo.marketName (line 21) ───┼──> [FLOW] String concatenation (line 24)
+  [SOURCE] deviceInfo.osFullName (line 22) ───┘           │
+                                                           ↓
+                                                  [STORAGE] this.deviceId (line 10)
+                                                           │
+                                    ┌──────────────────────┼──────────────────────┐
+                                    ↓                      ↓                      ↓
+                          [SINK] console.info      [SINK] showToast      [SINK] sendShortMessage
+                              (line 25)               (line 36)               (line 63)
+                                LOW                    MEDIUM                    HIGH
+                             Log Leakage            UI Leakage             Network Leakage
+
+# ========================================
+# 安全级别说明 (Security Levels)
+# ========================================
+
+security_levels:
+  S1:
+    name: "公开数据"
+    description: "可以公开的数据,无敏感性"
+    examples: ["固定字符串 'unknown'", "公开常量"]
+    
+  S2:
+    name: "低敏感数据"
+    description: "一般性数据,泄露影响较小"
+    examples: ["电话号码格式", "一般配置参数"]
+    
+  S3:
+    name: "中敏感数据"
+    description: "包含一定敏感信息,需要保护"
+    examples: ["操作系统版本", "应用配置"]
+    
+  S4:
+    name: "高敏感数据"
+    description: "高度敏感,泄露会造成严重影响"
+    examples: ["设备唯一标识符", "设备指纹信息", "个人隐私数据"]
