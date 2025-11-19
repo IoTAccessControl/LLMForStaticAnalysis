@@ -8,6 +8,11 @@
     },
     {
       "from": ["s", 25, "use"],
+      "to":   ["s", 29, "use"],
+      "type": "control"
+    },
+    {
+      "from": ["s", 29, "use"],
       "to":   ["oline", 31],
       "type": "control"
     }

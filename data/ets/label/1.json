@@ -1,0 +1,138 @@
+{
+    "source": [
+        {"2": "import { deviceInfo } from '@kit.BasicServicesKit';"}
+    ],
+    "sink": [
+        {"25": "console.info"},
+        {"36": "promptAction.showToast"},
+        {"64": "sms.sendShortMessage"},
+        {"75": "Text"}
+    ],
+    "flow": [
+        [
+            {"2": "deviceInfo"},
+            {"18": "manufacturer"},
+            {"24": "this.deviceId"},
+            {"25": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"19": "brand"},
+            {"24": "this.deviceId"},
+            {"25": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"20": "productModel"},
+            {"24": "this.deviceId"},
+            {"25": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"21": "marketName"},
+            {"24": "this.deviceId"},
+            {"25": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"22": "osFullName"},
+            {"24": "this.deviceId"},
+            {"25": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"18": "manufacturer"},
+            {"24": "this.deviceId"},
+            {"37": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"19": "brand"},
+            {"24": "this.deviceId"},
+            {"37": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"20": "productModel"},
+            {"24": "this.deviceId"},
+            {"37": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"21": "marketName"},
+            {"24": "this.deviceId"},
+            {"37": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"22": "osFullName"},
+            {"24": "this.deviceId"},
+            {"37": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"18": "manufacturer"},
+            {"24": "this.deviceId"},
+            {"56": "options"},
+            {"64": "options"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"19": "brand"},
+            {"24": "this.deviceId"},
+            {"56": "options"},
+            {"64": "options"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"20": "productModel"},
+            {"24": "this.deviceId"},
+            {"56": "options"},
+            {"64": "options"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"21": "marketName"},
+            {"24": "this.deviceId"},
+            {"56": "options"},
+            {"64": "options"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"22": "osFullName"},
+            {"24": "this.deviceId"},
+            {"56": "options"},
+            {"64": "options"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"18": "manufacturer"},
+            {"24": "this.deviceId"},
+            {"75": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"19": "brand"},
+            {"24": "this.deviceId"},
+            {"75": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"20": "productModel"},
+            {"24": "this.deviceId"},
+            {"75": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"21": "marketName"},
+            {"24": "this.deviceId"},
+            {"75": "this.deviceId"}
+        ],
+        [
+            {"2": "deviceInfo"},
+            {"22": "osFullName"},
+            {"24": "this.deviceId"},
+            {"75": "this.deviceId"}
+        ]
+    ]
+}

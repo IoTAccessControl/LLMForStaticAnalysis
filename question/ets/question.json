@@ -1,7 +1,7 @@
 [
     {
         "file_name": "1.ets",
-        "question": "**Question**: Is there information flow from `(brand, 19)` to `(options, 64)`? If so, provide a trace. **Output**:"
+        "question": "**Question**: Is there information flow from `(deviceInfo, 2)` to `(this.deviceId, 25)`? If so, provide a trace. **Output**:"
     },
     {
         "file_name": "2.ets",
