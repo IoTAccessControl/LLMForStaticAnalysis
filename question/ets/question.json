@@ -1,18 +1,18 @@
 [
     {
-        "file_name": "1.ets",
+        "file_name": "button1.ets",
         "question": "**Question**: Is there information flow from `(deviceInfo, 2)` to `(this.deviceId, 25)`? If so, provide a trace. **Output**:"
     },
     {
-        "file_name": "2.ets",
+        "file_name": "button2.ets",
         "question": "**Question**: Is there information flow from `(brand, 68)` to `(options, 31)`? If so, provide a trace. **Output**:"
     },
     {
-        "file_name": "3.ets",
+        "file_name": "button3.ets",
         "question": "**Question**: Is there information flow from `(brand, 53)` to `(options, 83)`? If so, provide a trace. **Output**:"
     },
     {
-        "file_name": "4.ets",
+        "file_name": "button4.ets",
         "question": "**Question**: Is there information flow from `(brand, 31)` to `(onClick, 136)`? If so, provide a trace. **Output**:"
     }
 ]

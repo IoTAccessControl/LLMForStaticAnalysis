@@ -1,0 +1,10 @@
+{
+  "flow": [
+    [
+      {"53": "brand"},
+      {"57": "deviceId"},
+      {"86": "content"},
+      {"83": "options"}
+    ]
+  ]
+}

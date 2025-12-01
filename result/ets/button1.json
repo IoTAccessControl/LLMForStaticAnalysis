@@ -1,0 +1,13 @@
+{
+  "flow": [
+    [
+      {"2": "deviceInfo"},
+      {"18": "manufacturer"},
+      {"19": "brand"},
+      {"20": "productModel"},
+      {"21": "marketName"},
+      {"22": "osFullName"},
+      {"24": "deviceId"}
+    ]
+  ]
+}

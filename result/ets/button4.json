@@ -1,0 +1,12 @@
+{
+    "flow": [
+        [
+            {"31": "brand"},
+            {"37": "deviceId"},
+            {"68": "buttonHint"},
+            {"61": "buttonHint"},
+            {"63": "buttonHint"},
+            {"136": "onClick"}
+        ]
+    ]
+}
