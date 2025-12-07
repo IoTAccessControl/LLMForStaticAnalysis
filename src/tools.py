@@ -9,7 +9,8 @@ def read_code_with_lineno(path):
     lines = []
     with open(path, "r", encoding="utf-8") as f:
         for i, line in enumerate(f, 1):
-            lines.append(f"{i}: {line.rstrip()}\n")
+            # lines.append(f"{i}: {line.rstrip()}\n")
+            lines.append(f"{line.rstrip()}\n")
     return "".join(lines)
 
 

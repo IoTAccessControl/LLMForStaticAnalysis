@@ -1,0 +1,240 @@
+[
+    {
+        "step": 1,
+        "from": {
+            "file": "entry/src/main/ets/pages/Index.ets",
+            "line": 90,
+            "code": "ApiManager.getInstance().qLookupCity(DataUtils.getCitySearchIdentity(city))",
+            "variable": "city"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 137,
+            "code": "public static getCitySearchIdentity(src: City): string {",
+            "variable": "src"
+        },
+        "type": "use",
+        "description": "变量 city 被传递给 DataUtils.getCitySearchIdentity 函数，映射为参数 src"
+    },
+    {
+        "step": 2,
+        "from": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 137,
+            "code": "public static getCitySearchIdentity(src: City): string {",
+            "variable": "src"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 138,
+            "code": "if (src.id != '') return src.id;",
+            "variable": "src.id"
+        },
+        "type": "use",
+        "description": "在函数内部使用了 src.id"
+    },
+    {
+        "step": 3,
+        "from": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 138,
+            "code": "if (src.id != '') return src.id;",
+            "variable": "src.id"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 138,
+            "code": "if (src.id != '') return src.id;",
+            "variable": "src.id"
+        },
+        "type": "control",
+        "description": "src.id 的值控制是否执行 return src.id;"
+    },
+    {
+        "step": 4,
+        "from": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 138,
+            "code": "if (src.id != '') return src.id;",
+            "variable": "src.id"
+        },
+        "to": {
+            "file": "entry/src/main/ets/pages/Index.ets",
+            "line": 90,
+            "code": "ApiManager.getInstance().qLookupCity(DataUtils.getCitySearchIdentity(city))",
+            "variable": "DataUtils.getCitySearchIdentity"
+        },
+        "type": "use",
+        "description": "条件判断影响函数返回值，最终结果用于 qLookupCity 方法调用"
+    },
+    {
+        "step": 5,
+        "from": {
+            "file": "entry/src/main/ets/pages/Index.ets",
+            "line": 90,
+            "code": "ApiManager.getInstance().qLookupCity(DataUtils.getCitySearchIdentity(city))",
+            "variable": "DataUtils.getCitySearchIdentity"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiManager.ets",
+            "line": 77,
+            "code": "public async qLookupCity(location: string) {",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": "函数返回值作为 location 参数传入 qLookupCity 方法"
+    },
+    {
+        "step": 6,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiManager.ets",
+            "line": 77,
+            "code": "public async qLookupCity(location: string) {",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiManager.ets",
+            "line": 78,
+            "code": "const res = await TaskManager.getInstance().qLookupCity(location);",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": "location 变量继续被传递到 TaskManager.qLookupCity"
+    },
+    {
+        "step": 7,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiManager.ets",
+            "line": 78,
+            "code": "const res = await TaskManager.getInstance().qLookupCity(location);",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/TaskManager.ets",
+            "line": 120,
+            "code": "public async qLookupCity(location: string): Promise<City[]> {",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": "location 继续被传递到 TaskManager 实例方法中"
+    },
+    {
+        "step": 8,
+        "from": {
+            "file": "libNMC/src/main/ets/api/TaskManager.ets",
+            "line": 120,
+            "code": "public async qLookupCity(location: string): Promise<City[]> {",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/TaskManager.ets",
+            "line": 124,
+            "code": "const task = new taskpool.Task(Q_ApiLookupCity, location, key, lang);",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": "location 被用于构造一个并发任务"
+    },
+    {
+        "step": 9,
+        "from": {
+            "file": "libNMC/src/main/ets/api/TaskManager.ets",
+            "line": 124,
+            "code": "const task = new taskpool.Task(Q_ApiLookupCity, location, key, lang);",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 234,
+            "code": "export async function Q_ApiLookupCity(location: string, key: string, lang: string): Promise<City[]> {",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": "location 作为参数传入 Q_ApiLookupCity 异步函数"
+    },
+    {
+        "step": 10,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 234,
+            "code": "export async function Q_ApiLookupCity(location: string, key: string, lang: string): Promise<City[]> {",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 239,
+            "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": "location 在请求 URL 构造时被使用"
+    },
+    {
+        "step": 11,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 239,
+            "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 60,
+            "code": "public static Q_CITY_LOOKUP(location: string, key: string, lang: string) {",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": "location 作为参数传入 Q_CITY_LOOKUP 静态方法"
+    },
+    {
+        "step": 12,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 60,
+            "code": "public static Q_CITY_LOOKUP(location: string, key: string, lang: string) {",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 61,
+            "code": "let url = `${ApiEndpoint.Q_GEO_API_CITY}lookup?location=${encodeURI(location)}&key=${key}&lang=${lang}`;",
+            "variable": "url"
+        },
+        "type": "use",
+        "description": "location 被编码并拼接到 URL 中"
+    },
+    {
+        "step": 13,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 61,
+            "code": "let url = `${ApiEndpoint.Q_GEO_API_CITY}lookup?location=${encodeURI(location)}&key=${key}&lang=${lang}`;",
+            "variable": "url"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 239,
+            "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
+            "variable": "url"
+        },
+        "type": "use",
+        "description": "生成的 URL 返回后用于 HTTP 请求"
+    },
+    {
+        "step": 14,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 239,
+            "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
+            "variable": "url"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 238,
+            "code": "req.request(",
+            "variable": "req.request"
+        },
+        "type": "use",
+        "description": "最终 URL 被传递给 req.request 方法发起网络请求"
+    }
+]

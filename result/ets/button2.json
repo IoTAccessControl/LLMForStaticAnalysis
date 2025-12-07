@@ -1,9 +1,9 @@
 {
-  "flow": [
-    [
-      {"68": "brand"},
-      {"73": "deviceId"},
-      {"34": "options"}
+    "flow": [
+        [
+            {"68": "brand"},
+            {"73": "deviceId"},
+            {"34": "options"}
+        ]
     ]
-  ]
 }

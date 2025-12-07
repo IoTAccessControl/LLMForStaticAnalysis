@@ -1,0 +1,274 @@
+[
+    {
+        "step": 1,
+        "from": {
+            "file": "entry/src/main/ets/pages/Index.ets",
+            "line": 90,
+            "code": "ApiManager.getInstance().qLookupCity(DataUtils.getCitySearchIdentity(city))",
+            "variable": "city"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 137,
+            "code": "public static getCitySearchIdentity(src: City): string {",
+            "variable": "src"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 2,
+        "from": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 137,
+            "code": "public static getCitySearchIdentity(src: City): string {",
+            "variable": "src"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 138,
+            "code": "if (src.id != '') return src.id;",
+            "variable": "src.id"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 3,
+        "from": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 138,
+            "code": "if (src.id != '') return src.id;",
+            "variable": "src.id"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 138,
+            "code": "if (src.id != '') return src.id;",
+            "variable": "src.id"
+        },
+        "type": "control",
+        "description": ""
+    },
+    {
+        "step": 4,
+        "from": {
+            "file": "libNMC/src/main/ets/Utils/DataUtils.ets",
+            "line": 138,
+            "code": "if (src.id != '') return src.id;",
+            "variable": "src.id"
+        },
+        "to": {
+            "file": "entry/src/main/ets/pages/Index.ets",
+            "line": 90,
+            "code": "ApiManager.getInstance().qLookupCity(DataUtils.getCitySearchIdentity(city))",
+            "variable": "DataUtils.getCitySearchIdentity"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 5,
+        "from": {
+            "file": "entry/src/main/ets/pages/Index.ets",
+            "line": 90,
+            "code": "ApiManager.getInstance().qLookupCity(DataUtils.getCitySearchIdentity(city))",
+            "variable": "DataUtils.getCitySearchIdentity"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiManager.ets",
+            "line": 77,
+            "code": "public async qLookupCity(location: string) {",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 6,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiManager.ets",
+            "line": 77,
+            "code": "public async qLookupCity(location: string) {",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiManager.ets",
+            "line": 78,
+            "code": "const res = await TaskManager.getInstance().qLookupCity(location);",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 7,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiManager.ets",
+            "line": 78,
+            "code": "const res = await TaskManager.getInstance().qLookupCity(location);",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/TaskManager.ets",
+            "line": 120,
+            "code": "public async qLookupCity(location: string): Promise<City[]> {",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 8,
+        "from": {
+            "file": "libNMC/src/main/ets/api/TaskManager.ets",
+            "line": 120,
+            "code": "public async qLookupCity(location: string): Promise<City[]> {",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/TaskManager.ets",
+            "line": 124,
+            "code": "const task = new taskpool.Task(Q_ApiLookupCity, location, key, lang);",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 9,
+        "from": {
+            "file": "libNMC/src/main/ets/api/TaskManager.ets",
+            "line": 124,
+            "code": "const task = new taskpool.Task(Q_ApiLookupCity, location, key, lang);",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 234,
+            "code": "export async function Q_ApiLookupCity(location: string, key: string, lang: string): Promise<City[]> {",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 10,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 234,
+            "code": "export async function Q_ApiLookupCity(location: string, key: string, lang: string): Promise<City[]> {",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 239,
+            "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 11,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 239,
+            "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 60,
+            "code": "public static Q_CITY_LOOKUP(location: string, key: string, lang: string) {",
+            "variable": "location"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 12,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 60,
+            "code": "public static Q_CITY_LOOKUP(location: string, key: string, lang: string) {",
+            "variable": "location"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 61,
+            "code": "let url = `${ApiEndpoint.Q_GEO_API_CITY}lookup?location=${encodeURI(location)}&key=${key}&lang=${lang}`;",
+            "variable": "url"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 13,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 61,
+            "code": "let url = `${ApiEndpoint.Q_GEO_API_CITY}lookup?location=${encodeURI(location)}&key=${key}&lang=${lang}`;",
+            "variable": "url"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 62,
+            "code": "Logger.log(TAG, \"Q_CITY_LOOKUP CALLED\", url);",
+            "variable": "url"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 14,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 62,
+            "code": "Logger.log(TAG, \"Q_CITY_LOOKUP CALLED\", url);",
+            "variable": "url"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 63,
+            "code": "return url;",
+            "variable": "url"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 15,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 63,
+            "code": "return url;",
+            "variable": "url"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 239,
+            "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
+            "variable": "url"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 16,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 239,
+            "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
+            "variable": "url"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiBundle.ets",
+            "line": 238,
+            "code": "req.request(",
+            "variable": "req.request"
+        },
+        "type": "use",
+        "description": ""
+    }
+]
