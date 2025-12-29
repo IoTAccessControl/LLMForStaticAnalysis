@@ -1,0 +1,216 @@
+File: data/Wechat_HarmonyOS/entry/src/main/ets/pages/mine/Mine.ets
+   12:   build() {
+   13:     Column() {
+   14: 
+   15:       Row() {
+   16:         Image(this.imgPath ? this.imgPath : $r('app.media.ic_user_head1'))
+   17:           .width(70)
+   18:           .height(70)
+   19:           .margin({ left: 25, right: 10 })
+   20:           .borderRadius(8)
+   21:           .onClick(() => {
+   22:             PhotoPickerUtils.openGallery(
+   23:               uri => {
+   24:                 this.imgPath = uri;
+   25:               }, errMsg => {
+   26:               Toast.show(errMsg)
+   27:             })
+   28:           })
+   29: 
+   30:         Column() {
+   31:           Text("亚瑟王")
+   32:             .fontColor(Color.Black)
+   33:             .fontSize(26)
+   34:             .fontWeight(700)
+   35: 
+   36:           Text("微信号：wx_023021")
+   37:             .fontColor(Color.Grey)
+   38:             .fontSize(16)
+   39:             .margin({ top: 15 })
+   40: 
+   41:           Text('+ 状态')
+   42:             .fontColor(Color.Grey)
+   43:             .margin({ top: 20 })
+   44:             .padding({ left: 8, right: 8 })
+   45:             .height(25)
+   46:             .fontSize(15)
+   47:             .borderRadius(20)
+   48:             .height(26)
+   49:             .textAlign(TextAlign.Center)
+   50:             .borderWidth(0.7)
+   51:             .borderColor('#666')
+   52:             .backgroundColor(Color.White)
+   53:         }
+   54:         .margin({ top: 40 })
+   55:         .alignItems(HorizontalAlign.Start)
+   56: 
+   57:         Blank()
+   58:         Image($r('app.media.ic_qrcode'))
+   59:           .width(16)
+   60:           .height(16)
+   61:           .margin({ top: 38, right: 20 })
+   62: 
+   63: 
+   64:         Image($r("app.media.ic_more"))
+   65:           .width(9)
+   66:           .height(16.364)
+   67:           .margin({ top: 38, right: 15 })
+   68: 
+   69:       }.width("100%")
+   70:       .height(203)
+   71:       .backgroundColor(Color.White)
+   72:       .padding({ top: WindowManager.statusBarHeight })
+   73:       .onClick(() => {
+   74:         router.pushUrl({ url: 'pages/qrcode/MyQrCodePage' })
+   75:       })
+   76: 
+   77:       Divider()
+   78:         .vertical(false)
+   79:         .color("#f3f3f3")
+   80:         .strokeWidth(10)
+   81:         .lineCap(LineCapStyle.Round)
+   82:       ListMenuItem({
+   83:         title: "服务",
+   84:         iconSrc: $r('app.media.ic_service')
+   85:       })
+   86:         .onClick(unDevTip)
+   87:       Divider()
+   88:         .vertical(false)
+   89:         .color("#f3f3f3")
+   90:         .strokeWidth(10)
+   91:         .lineCap(LineCapStyle.Round)
+   92:       ListMenuItem({
+   93:         title: "收藏",
+   94:         iconSrc: $r("app.media.ic_collect")
+   95:       })
+   96:         .onClick(unDevTip)
+   97: 
+   98:       Divider()
+   99:         .vertical(false)
+  100:         .color("#f3f3f3")
+  101:         .strokeWidth(1)
+  102:         .lineCap(LineCapStyle.Round)
+  103:       ListMenuItem({
+  104:         title: "朋友圈",
+  105:         iconSrc: $r('app.media.ic_moment_pic')
+  106:       })
+  107:         .onClick(unDevTip)
+  108:       Divider()
+  109:         .vertical(false)
+  110:         .color("#f3f3f3")
+  111:         .strokeWidth(1)
+  112:         .lineCap(LineCapStyle.Round)
+  113:       ListMenuItem({
+  114:         title: "卡包",
+  115:         iconSrc: $r('app.media.ic_card_pkg')
+  116:       }).onClick(unDevTip)
+  117:       Divider()
+  118:         .vertical(false)
+  119:         .color("#f3f3f3")
+  120:         .strokeWidth(1)
+  121:         .lineCap(LineCapStyle.Round)
+  122:       ListMenuItem({
+  123:         title: "表情",
+  124:         iconSrc: $r('app.media.ic_face_icon')
+  125:       }).onClick(unDevTip)
+  126:       Divider()
+  127:         .vertical(false)
+  128:         .color("#f3f3f3")
+  129:         .strokeWidth(10)
+  130:         .lineCap(LineCapStyle.Round)
+  131:       ListMenuItem({
+  132:         title: "设置",
+  133:         iconSrc: $r('app.media.ic_setting')
+  134:       })
+  135:         .onClick(unDevTip)
+  136:     }
+  137:     .width("100%")
+  138:     .height("100%")
+  139:     .backgroundColor("#f0f0f0")
+  140: 
+  141:   }
+
+File: data/Wechat_HarmonyOS/entry/src/main/ets/utils/PhotoPickerUtils.ets
+   12:   static async openGallery(onSuccess: (uri: string) => void, onFailed: (error: string) => void) {
+   13:     try {
+   14: 
+   15:       const granted = await PermissionUtils.request(['ohos.permission.WRITE_MEDIA', 'ohos.permission.READ_MEDIA'])
+   16:       if (!granted) {
+   17:         setTimeout(() => {
+   18:           AlertDialog.show({
+   19:             title: '温馨提示',
+   20:             message: '您已拒绝授予存储权限，是否允许前往设置中心授予权限？',
+   21:             autoCancel: false,
+   22:             alignment: DialogAlignment.Center,
+   23:             primaryButton: {
+   24:               value: '拒绝',
+   25:               action: () => {
+   26:                 onFailed("用户拒绝授予存储权限");
+   27:               }
+   28:             },
+   29:             secondaryButton: {
+   30:               fontColor: Color.Red,
+   31:               value: '允许',
+   32:               action: () => {
+   33:                 PermissionUtils.openPermissionSettingsPage()
+   34:                 onFailed("用户需要前往设置中心授予存储权限");
+   35:               }
+   36:             }
+   37:           })
+   38:         }, 100)
+   39:         return
+   40:       }
+   41:       let PhotoSelectOptions = new picker.PhotoSelectOptions()
+   42:       PhotoSelectOptions.MIMEType = picker.PhotoViewMIMETypes.IMAGE_TYPE
+   43:       PhotoSelectOptions.maxSelectNumber = 1
+   44:       let photoPicker = new picker.PhotoViewPicker()
+   45:       photoPicker.select(PhotoSelectOptions)
+   46:         .then(async res => {
+   47:           if (res.photoUris.length < 1) {
+   48:             onFailed("用户取消")
+   49:             return
+   50:           }
+   51:           const uri = res.photoUris[0]
+   52:           const newFile = await PhotoPickerUtils.copyFileToCache(uri)
+   53:           if (newFile.length < 1) {
+   54:             onFailed("图片获取失败")
+   55:             res
+   56:           }
+   57:           onSuccess(newFile)
+   58:         })
+   59:         .catch((err: BusinessError) => {
+   60:           onFailed(err.message)
+   61:           console.error('PhotoViewPicker.select failed with err: ' + JSON.stringify(err))
+   62:         })
+   63:     } catch (error) {
+   64:       let err: BusinessError = error as BusinessError
+   65:       console.error('PhotoViewPicker failed with err: ' + JSON.stringify(err))
+   66:       onFailed(err.message)
+   67:     }
+   68:   }
+
+File: data/Wechat_HarmonyOS/entry/src/main/ets/utils/PhotoPickerUtils.ets
+  124:   static async copyFileToCache(uri: string): Promise<string> {
+  125:     try {
+  126:       const index = uri.lastIndexOf('.')
+  127:       let fileType = index < 0 ? '.jpg' : uri.substring(index)
+  128:       if (fileType.length < 1) {
+  129:         fileType = '.jpg'
+  130:       }
+  131:       let dir = getContext().cacheDir + '/pictures'
+  132:       if (!fs.accessSync(dir)) {
+  133:         fs.mkdirSync(dir)
+  134:       }
+  135:       let newPath = dir + `/${new Date().getTime()}${fileType}`
+  136:       // 将文件拷贝到应用沙箱目录
+  137:       const file = fs.openSync(uri, fs.OpenMode.READ_ONLY)
+  138:       await fs.copyFile(file.fd, newPath)
+  139:       return `file://${newPath}`
+  140:     } catch (err) {
+  141:       console.info(`PhotoViewPicker:open file failed with error message: ${err.message}, error code: ${err.code}`)
+  142:     }
+  143:     return ""
+  144:   }
+
+
+

@@ -14,7 +14,7 @@
             "variable": "src"
         },
         "type": "use",
-        "description": "变量 city 被传递给 DataUtils.getCitySearchIdentity 函数，对应参数 src"
+        "description": ""
     },
     {
         "step": 2,
@@ -31,7 +31,7 @@
             "variable": "src.id"
         },
         "type": "use",
-        "description": "在函数内部使用了 src.id"
+        "description": ""
     },
     {
         "step": 3,
@@ -48,7 +48,7 @@
             "variable": "src.id"
         },
         "type": "control",
-        "description": "src.id 的值用于控制是否返回 src.id"
+        "description": ""
     },
     {
         "step": 4,
@@ -65,7 +65,7 @@
             "variable": "DataUtils.getCitySearchIdentity"
         },
         "type": "use",
-        "description": "根据条件判断结果返回 src.id 或构造字符串"
+        "description": ""
     },
     {
         "step": 5,
@@ -82,7 +82,7 @@
             "variable": "location"
         },
         "type": "use",
-        "description": "函数返回值作为参数传入 qLookupCity 方法"
+        "description": ""
     },
     {
         "step": 6,
@@ -99,7 +99,7 @@
             "variable": "location"
         },
         "type": "use",
-        "description": "location 参数被继续传递给 TaskManager 实例的 qLookupCity 方法"
+        "description": ""
     },
     {
         "step": 7,
@@ -116,7 +116,7 @@
             "variable": "location"
         },
         "type": "use",
-        "description": "location 参数被继续传递给 TaskManager 类中的 qLookupCity 方法"
+        "description": ""
     },
     {
         "step": 8,
@@ -133,7 +133,7 @@
             "variable": "location"
         },
         "type": "use",
-        "description": "location 参数被用于创建一个新的任务实例"
+        "description": ""
     },
     {
         "step": 9,
@@ -150,7 +150,7 @@
             "variable": "location"
         },
         "type": "use",
-        "description": "location 参数通过任务池执行被传递到 Q_ApiLookupCity 函数中"
+        "description": ""
     },
     {
         "step": 10,
@@ -167,7 +167,7 @@
             "variable": "location"
         },
         "type": "use",
-        "description": "location 参数被传递给 ApiEndpoint.Q_CITY_LOOKUP 方法"
+        "description": ""
     },
     {
         "step": 11,
@@ -184,7 +184,7 @@
             "variable": "location"
         },
         "type": "use",
-        "description": "location 参数被传递给 Q_CITY_LOOKUP 静态方法"
+        "description": ""
     },
     {
         "step": 12,
@@ -201,7 +201,7 @@
             "variable": "url"
         },
         "type": "use",
-        "description": "location 值被用来构建 URL 字符串"
+        "description": ""
     },
     {
         "step": 13,
@@ -212,16 +212,50 @@
             "variable": "url"
         },
         "to": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 62,
+            "code": "Logger.log(TAG, \"Q_CITY_LOOKUP CALLED\", url);",
+            "variable": "url"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 14,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 62,
+            "code": "Logger.log(TAG, \"Q_CITY_LOOKUP CALLED\", url);",
+            "variable": "url"
+        },
+        "to": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 63,
+            "code": "return url;",
+            "variable": "url"
+        },
+        "type": "use",
+        "description": ""
+    },
+    {
+        "step": 15,
+        "from": {
+            "file": "libNMC/src/main/ets/api/ApiEndpoint.ets",
+            "line": 63,
+            "code": "return url;",
+            "variable": "url"
+        },
+        "to": {
             "file": "libNMC/src/main/ets/api/ApiBundle.ets",
             "line": 239,
             "code": "ApiEndpoint.Q_CITY_LOOKUP(location, key, lang),",
             "variable": "url"
         },
         "type": "use",
-        "description": "生成的 url 被返回并用于后续请求"
+        "description": ""
     },
     {
-        "step": 14,
+        "step": 16,
         "from": {
             "file": "libNMC/src/main/ets/api/ApiBundle.ets",
             "line": 239,
@@ -235,6 +269,6 @@
             "variable": "req.request"
         },
         "type": "use",
-        "description": "最终 url 被用于发起 HTTP 请求"
+        "description": ""
     }
 ]
